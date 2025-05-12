@@ -1,0 +1,38 @@
+ion-content {
+    --background: #F4F4F4;
+  }
+ion-header, ion-toolbar, ion-content, ion-footer {
+    box-shadow: none !important;
+    border: none !important;
+    --border-width: 0 !important;
+    --border-color: transparent !important;
+}
+
+form ion-item {
+    margin-bottom: 12px;
+  }
+  
+  input[type="file"] {
+    padding: 6px 0;
+    width: 100%;
+  }
+  
+  ion-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  }
+  
+/*Footer*/
+.icon-buttons {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+  }
+  
+  ion-button {
+    width: 100%;
+  }
+
+  ion-icon {
+    color: black;
+  }

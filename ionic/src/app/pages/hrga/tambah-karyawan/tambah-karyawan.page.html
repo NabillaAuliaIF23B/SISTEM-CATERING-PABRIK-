@@ -1,0 +1,76 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Tambah Karyawan</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title class="ion-text-center">Form Tambah Karyawan</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <form (submit)="submit()" enctype="multipart/form-data">
+        <ion-item>
+          <ion-input label="Username" [(ngModel)]="form.username" name="username" required></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input label="Email" [(ngModel)]="form.email" name="email" required type="email"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input label="Nama" [(ngModel)]="form.nama" name="nama" required></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input label="Password" [(ngModel)]="form.password" name="password" required type="password"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Role</ion-label>
+          <ion-select [(ngModel)]="form.role" name="role" required>
+            <ion-select-option value="karyawan">Karyawan</ion-select-option>
+            <ion-select-option value="koki">Koki</ion-select-option>
+            <ion-select-option value="hrga">HRGA</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-input label="Tanggal Masuk" [(ngModel)]="form.tanggal_masuk" name="tanggal_masuk" required type="date"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Foto</ion-label>
+          <input type="file" (change)="onFileChange($event)" />
+        </ion-item>
+
+        <ion-button expand="full" type="submit" class="ion-margin-top"  expand="block">Simpan</ion-button>
+      </form>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="start" class="icon-buttons">
+      <ion-button [routerLink]="['/dashboard-hrga']" fill="clear" size="large">
+        <ion-icon name="grid-outline"></ion-icon>
+      </ion-button>
+      <ion-button [routerLink]="['/data-karyawan']" fill="clear" size="large">
+        <ion-icon name="people-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-buttons slot="end" class="icon-buttons">
+      <ion-button [routerLink]="['/halaman-3']" fill="clear" size="large">
+        <ion-icon name="list-outline"></ion-icon>
+      </ion-button>
+      <ion-button [routerLink]="['/profile-hrga']" fill="clear" size="large">
+        <ion-icon name="person-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>
