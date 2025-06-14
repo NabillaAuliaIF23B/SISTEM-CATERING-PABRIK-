@@ -4,92 +4,68 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Models\Karyawan;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Karyawan;
 
-
-use Illuminate\Support\Facades\Auth;
 
 
 class AuthController extends Controller
 {
+    //login App
     public function login(Request $request)
     {
         $request->validate([
-            'username' => 'required',
-            'password' => 'required',
+            'username' => 'required|string',
+            'password' => 'required|string',
         ]);
 
-        $karyawan = Karyawan::where('username', $request->username)->first();
+        $user = Karyawan::where('username', $request->username)->first();
 
-        if (!$karyawan || !Hash::check($request->password, $karyawan->password)) {
-            return response()->json(['message' => 'Login gagal'], 401);
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
+        // Cek status akun
+        if ($user->status !== 'aktif') {
+            return response()->json(['message' => 'Akun tidak aktif'], 403);
+        }
+
+        // Buat token
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         return response()->json([
-            'message' => 'Login berhasil',
-            'user' => $karyawan
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'role' => $user->role,
+            'nama' => $user->nama,
+            'username' => $user->username,
         ]);
     }
+
+    public function profile(Request $request)
+    {
+        return response()->json($request->user());
+    }
+    
+    public function gantiPassword(Request $request)
+    {
+        $request->validate([
+            'password_baru' => 'required|string|min:6',
+        ]);
+    
+        $user = $request->user(); // Ambil user dari token
+        $user->password = $request->password_baru; // TANPA HASH (hanya untuk testing/permintaan kamu)
+        $user->save();
+    
+        return response()->json(['message' => 'Password berhasil diganti.']);
+    }
+
 
     public function logout(Request $request)
     {
-        // Hapus semua token pengguna
-        Auth::user()->tokens->each(function ($token) {
-            $token->delete();
-        });
+        $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json(['message' => 'Logged out']);
     }
 
-    public function uploadFoto(Request $request)
-    {
-        $request->validate([
-            'id_karyawan' => 'required|exists:karyawan,id_karyawan',
-            'foto' => 'required|image|mimes:jpg,jpeg,png|max:2048'
-        ]);
-
-        $karyawan = Karyawan::find($request->id_karyawan);
-
-        $filename = uniqid() . '.' . $request->foto->extension();
-        $request->foto->storeAs('public/foto', $filename);
-
-        $karyawan->foto = $filename;
-        $karyawan->save();
-
-        return response()->json(['message' => 'Foto berhasil diupload', 'foto_url' => asset('storage/foto/' . $filename)]);
-    }
-
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'username' => 'required|unique:karyawan',
-            'email' => 'required|email|unique:karyawan',
-            'nama' => 'required',
-            'password' => 'required|min:6',
-            'role' => 'required|in:karyawan,koki,hrga',
-            'tanggal_masuk' => 'required|date',
-            'foto' => 'nullable|image|max:2048'
-        ]);
-
-        $fotoPath = $request->file('foto') 
-            ? $request->file('foto')->store('foto-karyawan', 'public') 
-            : null;
-
-        $karyawan = Karyawan::create([
-            'username' => $request->username,
-            'email' => $request->email,
-            'nama' => $request->nama,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'tanggal_masuk' => $request->tanggal_masuk,
-            'foto' => $fotoPath
-        ]);
-
-        return response()->json([
-            'message' => 'Karyawan berhasil ditambahkan',
-            'data' => $karyawan
-        ], 201);
-    }
 }
